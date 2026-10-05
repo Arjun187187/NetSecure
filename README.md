@@ -31,7 +31,8 @@ NetSecure is a defensive, authorized network security assessment and reporting p
 - [Troubleshooting & FAQ](#troubleshooting--faq)
 - [Limitations & Future Improvements](#limitations--future-improvements)
 - [Contributing & Responsible Disclosure](#contributing--responsible-disclosure)
-- [License & Screenshots](#license--screenshots)
+- [Screenshots & Platform Walkthrough](#screenshots--platform-walkthrough)
+- [License](#license)
 - [Project Status](#project-status)
 
 ---
@@ -400,19 +401,52 @@ If you discover a security vulnerability within NetSecure itself, please report 
 
 ---
 
-## License & Screenshots
+## Screenshots & Platform Walkthrough
 
-### License
+NetSecure provides a professional security-operations interface for authorized network assessment, asset tracking, evidence-based findings analysis, scan history, and machine-readable and professional security reporting.
+
+### Security Operations Dashboard
+
+![NetSecure Security Operations Dashboard](screenshots/dashboard.png)
+
+Central dashboard showing asset inventory, completed assessments, findings, severity distribution, recent assessments, and overall security posture.
+
+### Host Security Assessment
+
+![NetSecure Host Security Assessment](screenshots/host-assessment.png)
+
+Authorized host assessment workflow showing target validation, authorization control, assessment execution, and security posture scoring.
+
+### Security Findings
+
+![NetSecure Security Findings](screenshots/security-findings.png)
+
+Evidence-based findings catalogue showing detected service exposure, severity, confidence, technical analysis, and remediation context.
+
+### Security Reports
+
+![NetSecure Generated Security Reports](screenshots/reports.png)
+
+Reporting interface showing generated machine-readable JSON and professional PDF security reports.
+
+### Professional PDF Security Report
+
+![NetSecure Professional PDF Security Report](screenshots/pdf-report.png)
+
+Example ReportLab-generated security assessment report containing assessment metadata, executive summary, posture score, methodology, findings, and remediation information.
+
+---
+
+## License
+
 This project is currently maintained as a personal cybersecurity portfolio project. License terms may be designated prior to general public open-source distribution.
-
-### Screenshots & Demos
-High-resolution interface screenshots and walk-through demonstrations will be added to the repository assets upon final tagged release.
 
 ---
 
 ## Project Status
 
-- **Current Version**: `1.0.0-rc`
-- **Development Status**: Active / Security Portfolio Project
+- **Current Version**: `1.0.0`
+- **Development Status**: Completed / Security Portfolio Project
 - **Maintainer**: Arjun C S ([GitHub Repository](https://github.com/Arjun187187/NetSecure))
+
 

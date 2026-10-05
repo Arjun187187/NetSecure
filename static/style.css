@@ -1,0 +1,58 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0; font-family: Inter, Arial, sans-serif;
+  background: #07110e; color: #e9f5ef;
+}
+header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 28px 7%; border-bottom: 1px solid #183329;
+  background: #0b1814;
+}
+h1 { margin: 0; font-size: 34px; }
+header p { margin: 6px 0 0; color: #91aaa0; }
+.badge { border: 1px solid #2e6953; padding: 8px 12px; border-radius: 20px; font-size: 12px; }
+main { max-width: 1200px; margin: 35px auto; padding: 0 20px; }
+.card {
+  background: #0d1c17; border: 1px solid #19372b; border-radius: 16px;
+  padding: 24px; margin-bottom: 22px;
+}
+.scan-box h2, .card h2 { margin-top: 0; }
+.form { display: flex; gap: 12px; margin-top: 20px; }
+input {
+  flex: 1; background: #07110e; color: white; border: 1px solid #2a4d40;
+  border-radius: 10px; padding: 14px; font-size: 15px;
+}
+button {
+  border: 0; border-radius: 10px; padding: 0 22px; font-weight: 700;
+  background: #86b99e; color: #06100c; cursor: pointer;
+}
+#status { margin-top: 14px; color: #91aaa0; }
+.stats {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px;
+  margin-bottom: 22px;
+}
+.stat {
+  background: #0d1c17; border: 1px solid #19372b; border-radius: 14px;
+  padding: 18px;
+}
+.stat span { display: block; color: #8ca69b; font-size: 13px; }
+.stat strong { display: block; font-size: 25px; margin-top: 7px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 13px; border-bottom: 1px solid #19372b; text-align: left; }
+th { color: #9eb8ad; font-size: 13px; }
+.risk { font-size: 11px; font-weight: 800; padding: 5px 8px; border-radius: 10px; }
+.high { background: #5b2727; color: #ffb3b3; }
+.medium { background: #594a20; color: #ffe49a; }
+.low { background: #234b39; color: #b8f0ce; }
+.info { background: #253a48; color: #b9d9ec; }
+.critical { background: #691d2a; color: #ffd0d7; }
+.download { color: #bde8d0; text-decoration: none; }
+.hidden { display: none; }
+.table-head { display:flex; justify-content:space-between; align-items:center; }
+@media(max-width:800px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .form { flex-direction: column; }
+  button { height: 48px; }
+  header { gap: 15px; flex-direction: column; align-items: flex-start; }
+}

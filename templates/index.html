@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NetSecure</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h1>NetSecure</h1>
+      <p>Network Vulnerability Assessment & Reporting Tool</p>
+    </div>
+    <span class="badge">AUTHORIZED LAB USE</span>
+  </header>
+
+  <main>
+    <section class="card scan-box">
+      <h2>Start Security Assessment</h2>
+      <p>Scan only systems you own or have explicit permission to assess.</p>
+      <div class="form">
+        <input id="target" placeholder="127.0.0.1 or lab hostname" value="127.0.0.1">
+        <button onclick="startScan()">START SCAN</button>
+      </div>
+      <div id="status"></div>
+    </section>
+
+    <section id="dashboard" class="hidden">
+      <div class="stats">
+        <div class="stat"><span>Target</span><strong id="targetOut">-</strong></div>
+        <div class="stat"><span>Open Ports</span><strong id="openPorts">0</strong></div>
+        <div class="stat"><span>High Risk</span><strong id="high">0</strong></div>
+        <div class="stat"><span>Medium Risk</span><strong id="medium">0</strong></div>
+        <div class="stat"><span>Low Risk</span><strong id="low">0</strong></div>
+      </div>
+
+      <div class="card">
+        <div class="table-head">
+          <h2>Security Findings</h2>
+          <span id="nmap"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Port</th><th>Service</th><th>Version</th><th>Risk</th><th>Recommendation</th></tr>
+            </thead>
+            <tbody id="findings"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Assessment Summary</h2>
+        <p id="summary"></p>
+        <a id="download" class="download" href="#">Download JSON Report</a>
+      </div>
+    </section>
+  </main>
+
+<script>
+async function startScan() {
+  const target = document.getElementById("target").value.trim();
+  const status = document.getElementById("status");
+  if (!target) return;
+  status.textContent = "Scanning authorized target...";
+  document.getElementById("dashboard").classList.add("hidden");
+
+  try {
+    const res = await fetch("/api/scan", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({target})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Scan failed");
+
+    document.getElementById("dashboard").classList.remove("hidden");
+    document.getElementById("targetOut").textContent = data.target + " (" + data.ip + ")";
+    document.getElementById("openPorts").textContent = data.open_ports;
+    document.getElementById("high").textContent = data.counts.HIGH;
+    document.getElementById("medium").textContent = data.counts.MEDIUM;
+    document.getElementById("low").textContent = data.counts.LOW;
+    document.getElementById("nmap").textContent = data.nmap_available ? "Nmap enabled" : "Nmap not found";
+
+    const tbody = document.getElementById("findings");
+    tbody.innerHTML = "";
+    for (const f of data.findings) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${f.port}</td><td>${f.service}</td><td>${f.version || "-"}</td>
+        <td><span class="risk ${f.risk.toLowerCase()}">${f.risk}</span></td>
+        <td>${f.recommendation}</td>`;
+      tbody.appendChild(tr);
+    }
+
+    document.getElementById("summary").textContent =
+      `Assessment completed. ${data.open_ports} open port(s) were found across ${data.ports_scanned} common ports.`;
+    document.getElementById("download").href = "/reports/" + data.report_file;
+    status.textContent = "Scan completed successfully.";
+  } catch (err) {
+    status.textContent = "Error: " + err.message;
+  }
+}
+</script>
+</body>
+</html>

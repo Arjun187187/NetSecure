@@ -3,104 +3,1490 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NetSecure</title>
+  <title>NetSecure — Defensive Network Assessment Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
   <header>
-    <div>
-      <h1>NetSecure</h1>
-      <p>Network Vulnerability Assessment & Reporting Tool</p>
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="brand-title">
+          <h1>NetSecure</h1>
+          <p>Defensive Network Vulnerability Assessment Platform</p>
+        </div>
+      </div>
+      <div class="badge-lab">
+        <span class="badge-dot"></span>
+        <span>Authorized Lab Scope</span>
+      </div>
     </div>
-    <span class="badge">AUTHORIZED LAB USE</span>
   </header>
 
   <main>
-    <section class="card scan-box">
-      <h2>Start Security Assessment</h2>
-      <p>Scan only systems you own or have explicit permission to assess.</p>
-      <div class="form">
-        <input id="target" placeholder="127.0.0.1 or lab hostname" value="127.0.0.1">
-        <button onclick="startScan()">START SCAN</button>
-      </div>
-      <div id="status"></div>
-    </section>
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button id="tabDashboard" class="tab-btn active" onclick="switchTab('dashboard')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/>
+          <rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        <span>Dashboard</span>
+      </button>
+      <button id="tabHost" class="tab-btn" onclick="switchTab('host')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <span>Host Assessment</span>
+      </button>
+      <button id="tabDiscovery" class="tab-btn" onclick="switchTab('discovery')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="2" width="20" height="8" rx="2"/>
+          <rect x="2" y="14" width="20" height="8" rx="2"/>
+          <line x1="6" y1="6" x2="6.01" y2="6"/>
+          <line x1="6" y1="18" x2="6.01" y2="18"/>
+        </svg>
+        <span>Network Discovery</span>
+      </button>
+      <button id="tabAssets" class="tab-btn" onclick="switchTab('assets')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Assets</span>
+      </button>
+      <button id="tabScans" class="tab-btn" onclick="switchTab('scans')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        <span>Scan History</span>
+      </button>
+      <button id="tabFindings" class="tab-btn" onclick="switchTab('findings')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span>Findings</span>
+      </button>
+      <button id="tabReports" class="tab-btn" onclick="switchTab('reports')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <span>Reports</span>
+      </button>
+    </div>
 
-    <section id="dashboard" class="hidden">
-      <div class="stats">
-        <div class="stat"><span>Target</span><strong id="targetOut">-</strong></div>
-        <div class="stat"><span>Open Ports</span><strong id="openPorts">0</strong></div>
-        <div class="stat"><span>High Risk</span><strong id="high">0</strong></div>
-        <div class="stat"><span>Medium Risk</span><strong id="medium">0</strong></div>
-        <div class="stat"><span>Low Risk</span><strong id="low">0</strong></div>
-      </div>
-
-      <div class="card">
-        <div class="table-head">
-          <h2>Security Findings</h2>
-          <span id="nmap"></span>
+    <!-- 1. DASHBOARD OVERVIEW SECTION -->
+    <div id="dashboardSection">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-label">Total Assets</span>
+          <div id="dashTotalAssets" class="stat-value">0</div>
         </div>
-        <div class="table-wrap">
+        <div class="stat-card low">
+          <span class="stat-label">Active Hosts (UP)</span>
+          <div id="dashActiveAssets" class="stat-value">0</div>
+        </div>
+        <div class="stat-card info">
+          <span class="stat-label">Completed Scans</span>
+          <div id="dashTotalAssessments" class="stat-value">0</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Open Findings</span>
+          <div id="dashTotalFindings" class="stat-value">0</div>
+        </div>
+        <div class="stat-card critical">
+          <span class="stat-label">Critical</span>
+          <div id="dashCntCritical" class="stat-value">0</div>
+        </div>
+        <div class="stat-card high">
+          <span class="stat-label">High Risk</span>
+          <div id="dashCntHigh" class="stat-value">0</div>
+        </div>
+        <div class="stat-card medium">
+          <span class="stat-label">Medium Risk</span>
+          <div id="dashCntMedium" class="stat-value">0</div>
+        </div>
+        <div class="stat-card low">
+          <span class="stat-label">Low Risk</span>
+          <div id="dashCntLow" class="stat-value">0</div>
+        </div>
+      </div>
+
+      <div class="posture-score-box">
+        <div class="score-main">
+          <div id="dashScoreCircle" class="score-circle rating-strong">100</div>
+          <div class="score-meta">
+            <h3>NetSecure Security Posture</h3>
+            <p id="dashScoreExplanation">Assessment-based security posture score weighted by findings severity & confidence.</p>
+          </div>
+        </div>
+        <span id="dashRatingBadge" class="rating-badge strong">STRONG</span>
+      </div>
+
+      <div class="risk-distribution-box">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:13px; font-weight:700; color:var(--text-main);">Risk Distribution by Severity</span>
+          <span id="dashFindingsSummaryText" style="font-size:12px; color:var(--text-muted);">0 Findings Evaluated</span>
+        </div>
+        <div class="risk-dist-bar">
+          <div id="distCritical" class="dist-segment critical" style="width: 0%;"></div>
+          <div id="distHigh" class="dist-segment high" style="width: 0%;"></div>
+          <div id="distMedium" class="dist-segment medium" style="width: 0%;"></div>
+          <div id="distLow" class="dist-segment low" style="width: 0%;"></div>
+          <div id="distInfo" class="dist-segment info" style="width: 0%;"></div>
+        </div>
+        <div class="risk-dist-labels">
+          <div class="dist-label-item"><span class="dist-dot critical"></span> Critical: <strong id="lblCritical">0</strong></div>
+          <div class="dist-label-item"><span class="dist-dot high"></span> High: <strong id="lblHigh">0</strong></div>
+          <div class="dist-label-item"><span class="dist-dot medium"></span> Medium: <strong id="lblMedium">0</strong></div>
+          <div class="dist-label-item"><span class="dist-dot low"></span> Low: <strong id="lblLow">0</strong></div>
+          <div class="dist-label-item"><span class="dist-dot info"></span> Info: <strong id="lblInfo">0</strong></div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap:24px;">
+        <section class="card" style="margin-bottom:0;">
+          <div class="card-header">
+            <h2 class="card-title">Top Priority Findings</h2>
+            <button class="btn-secondary" onclick="switchTab('findings')">View All</button>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Finding ID</th>
+                  <th>Severity</th>
+                  <th>Target / Port</th>
+                  <th>Service</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="dashTopFindingsBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card" style="margin-bottom:0;">
+          <div class="card-header">
+            <h2 class="card-title">Recent Assessments</h2>
+            <button class="btn-secondary" onclick="switchTab('scans')">View History</button>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Assessment ID</th>
+                  <th>Target</th>
+                  <th>Rating</th>
+                  <th>Score</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="dashRecentScansBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- 2. HOST ASSESSMENT SECTION -->
+    <div id="hostAssessmentSection" class="hidden">
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Target Host Security Assessment</h2>
+          <span id="targetTypeBadgeHeader" class="type-badge loopback">LOOPBACK</span>
+        </div>
+
+        <div class="notice-box">
+          <svg class="notice-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>Authorization Control: Assess only systems you own or have explicit authorization to test.</span>
+        </div>
+
+        <div class="form-group">
+          <div class="input-wrapper">
+            <input type="text" id="target" placeholder="127.0.0.1 or target hostname" value="127.0.0.1" autocomplete="off" oninput="handleTargetInput()">
+          </div>
+          <button id="scanBtn" class="btn-primary" onclick="startScan()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <span>START ASSESSMENT</span>
+          </button>
+        </div>
+
+        <div id="authConfirmContainer" class="auth-confirm-box hidden">
+          <input type="checkbox" id="authConfirmCheckbox" onchange="toggleAuthScanBtn()">
+          <label for="authConfirmCheckbox">
+            I confirm that I own this target or have explicit authorization to assess it.
+          </label>
+        </div>
+
+        <div id="statusCard" class="status-card">
+          <div class="status-left">
+            <span id="statusDot" class="status-indicator"></span>
+            <span id="statusText">Ready — Enter an authorized IP address or target hostname.</span>
+          </div>
+          <span id="nmapStatus" class="engine-tag">
+            <span class="engine-dot"></span>
+            <span id="nmapLabel">Detecting Nmap...</span>
+          </span>
+        </div>
+      </section>
+
+      <section id="dashboard" class="hidden">
+        <div class="card" style="padding:16px 24px; margin-bottom:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Assessment Identifier</span>
+              <div id="assessmentIdDisplay" class="assessment-id-tag" style="margin-top:4px; font-size:14px;">-</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:13px; color:var(--text-muted);">Scope Classification:</span>
+              <span id="targetTypeBadge" class="type-badge loopback">LOOPBACK</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="posture-score-box">
+          <div class="score-main">
+            <div id="postureScoreCircle" class="score-circle rating-strong">100</div>
+            <div class="score-meta">
+              <h3>NetSecure Security Posture Score</h3>
+              <p id="scoreExplanation">Assessment-based risk score weighted by findings severity & confidence.</p>
+            </div>
+          </div>
+          <span id="postureRatingBadge" class="rating-badge strong">STRONG</span>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">Target IP</span>
+            <div id="targetOut" class="stat-value" style="font-size:16px;">-</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Open Ports</span>
+            <div id="openPorts" class="stat-value">0</div>
+          </div>
+          <div class="stat-card critical">
+            <span class="stat-label">Critical</span>
+            <div id="cntCritical" class="stat-value">0</div>
+          </div>
+          <div class="stat-card high">
+            <span class="stat-label">High Risk</span>
+            <div id="cntHigh" class="stat-value">0</div>
+          </div>
+          <div class="stat-card medium">
+            <span class="stat-label">Medium Risk</span>
+            <div id="cntMedium" class="stat-value">0</div>
+          </div>
+          <div class="stat-card low">
+            <span class="stat-label">Low Risk</span>
+            <div id="cntLow" class="stat-value">0</div>
+          </div>
+          <div class="stat-card info">
+            <span class="stat-label">Info</span>
+            <div id="cntInfo" class="stat-value">0</div>
+          </div>
+        </div>
+
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Security Findings</h2>
+            <span id="findingsCountTag" class="engine-tag">0 Findings</span>
+          </div>
+
+          <div id="zeroFindingsContainer" class="hidden">
+            <div class="zero-findings-box">
+              <h3>No Significant Security Findings Identified</h3>
+              <p id="zeroFindingsText">No open ports or risk considerations were detected within the tested scope. Note: This assessment does not guarantee the absence of vulnerabilities.</p>
+            </div>
+          </div>
+
+          <div id="findingsTableWrap" class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Port / Proto</th>
+                  <th>Service & Version</th>
+                  <th>Risk / Confidence</th>
+                  <th>Finding Title & Security Analysis</th>
+                </tr>
+              </thead>
+              <tbody id="findingsBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Assessment Summary Report</h2>
+          </div>
+          <p id="summaryText" style="color:var(--text-muted); font-size:13px;"></p>
+          <div class="summary-details">
+            <div class="summary-item"><label>Assessment ID</label><span id="summaryId">-</span></div>
+            <div class="summary-item"><label>Classification</label><span id="summaryType">-</span></div>
+            <div class="summary-item"><label>Posture Score & Rating</label><span id="summaryScoreDisplay">-</span></div>
+            <div class="summary-item"><label>Scan Started</label><span id="scanStarted">-</span></div>
+            <div class="summary-item"><label>Scan Completed</label><span id="scanCompleted">-</span></div>
+            <div class="summary-item"><label>Scan Duration</label><span id="scanDuration">-</span></div>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:12px;">
+            <a id="downloadJsonBtn" class="btn-download" href="#" target="_blank">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>Download JSON Report</span>
+            </a>
+            <a id="downloadPdfBtn" class="btn-download" href="#" target="_blank" style="color:#ff8e9e; border-color:#8b2635;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+              <span>Download Professional PDF Report</span>
+            </a>
+          </div>
+        </section>
+      </section>
+    </div>
+
+    <!-- 3. NETWORK DISCOVERY SECTION -->
+    <div id="networkDiscoverySection" class="hidden">
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Controlled Network Discovery</h2>
+          <span class="type-badge private">PRIVATE LAB SCOPE</span>
+        </div>
+
+        <div class="notice-box">
+          <svg class="notice-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>Discovery Control: Discover active assets on authorized private subnets (e.g. 192.168.1.0/24 or 127.0.0.0/29). Max limit 256 hosts.</span>
+        </div>
+
+        <div class="form-group">
+          <div class="input-wrapper">
+            <input type="text" id="networkInput" placeholder="192.168.1.0/24 or 127.0.0.0/29" value="127.0.0.0/29" autocomplete="off">
+          </div>
+          <button id="discoverBtn" class="btn-primary" onclick="startDiscovery()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <span>DISCOVER HOSTS</span>
+          </button>
+        </div>
+
+        <div id="discoveryStatusCard" class="status-card">
+          <div class="status-left">
+            <span id="discStatusDot" class="status-indicator"></span>
+            <span id="discStatusText">Ready — Enter a private CIDR subnet notation.</span>
+          </div>
+          <span id="discScopeTag" class="engine-tag">Max 256 Hosts</span>
+        </div>
+      </section>
+
+      <section id="discoveryDashboard" class="hidden">
+        <div class="card" style="padding:16px 24px; margin-bottom:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Discovery Identifier</span>
+              <div id="discoveryIdDisplay" class="assessment-id-tag" style="margin-top:4px; font-size:14px;">-</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:13px; color:var(--text-muted);">Target Subnet:</span>
+              <span id="discNetworkBadge" class="type-badge private">PRIVATE</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><span class="stat-label">Hosts Evaluated</span><div id="discHostsChecked" class="stat-value">0</div></div>
+          <div class="stat-card low"><span class="stat-label">Active Hosts (UP)</span><div id="discHostsUp" class="stat-value">0</div></div>
+          <div class="stat-card"><span class="stat-label">Inactive Hosts</span><div id="discHostsDown" class="stat-value">0</div></div>
+          <div class="stat-card info"><span class="stat-label">Duration</span><div id="discDuration" class="stat-value" style="font-size:22px;">0s</div></div>
+        </div>
+
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">Discovered Assets</h2>
+            <span id="assetsCountTag" class="engine-tag">0 Asset(s) Found</span>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Asset ID</th>
+                  <th>IP Address</th>
+                  <th>Hostname</th>
+                  <th>Status</th>
+                  <th>Scope</th>
+                  <th>Last Seen</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="assetBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </div>
+
+    <!-- 4. ASSETS INVENTORY SECTION -->
+    <div id="assetsSection" class="hidden">
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Asset Inventory & Risk Tracking</h2>
+          <button class="btn-primary" onclick="switchTab('discovery')">Run Network Discovery</button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label for="assetSearchInput">Search Asset:</label>
+            <input type="search" id="assetSearchInput" placeholder="IP, hostname, asset ID..." oninput="filterAssetsTable()">
+          </div>
+          <div class="filter-group">
+            <label for="assetStatusFilter">Status:</label>
+            <select id="assetStatusFilter" onchange="filterAssetsTable()">
+              <option value="">All Statuses</option>
+              <option value="UP">Active (UP)</option>
+              <option value="DOWN">Inactive (DOWN)</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="assetRiskFilter">Risk Rating:</label>
+            <select id="assetRiskFilter" onchange="filterAssetsTable()">
+              <option value="">All Risk Ratings</option>
+              <option value="CRITICAL RISK">CRITICAL RISK</option>
+              <option value="HIGH RISK">HIGH RISK</option>
+              <option value="MODERATE">MODERATE</option>
+              <option value="GOOD">GOOD</option>
+              <option value="STRONG">STRONG</option>
+              <option value="UNASSESSED">UNASSESSED</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive">
           <table>
             <thead>
-              <tr><th>Port</th><th>Service</th><th>Version</th><th>Risk</th><th>Recommendation</th></tr>
+              <tr>
+                <th>Asset ID</th>
+                <th>IP Address</th>
+                <th>Hostname</th>
+                <th>Status</th>
+                <th>Scope</th>
+                <th>Open Ports</th>
+                <th>Findings</th>
+                <th>Posture Score</th>
+                <th>Last Assessed</th>
+                <th>Actions</th>
+              </tr>
             </thead>
-            <tbody id="findings"></tbody>
+            <tbody id="assetsInventoryBody"></tbody>
           </table>
         </div>
-      </div>
+      </section>
+    </div>
 
-      <div class="card">
-        <h2>Assessment Summary</h2>
-        <p id="summary"></p>
-        <a id="download" class="download" href="#">Download JSON Report</a>
-      </div>
-    </section>
+    <!-- 5. SCANS HISTORY SECTION -->
+    <div id="scansSection" class="hidden">
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Assessment Scan History</h2>
+          <button class="btn-primary" onclick="switchTab('host')">New Host Assessment</button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label for="scanSearchInput">Search Scan:</label>
+            <input type="search" id="scanSearchInput" placeholder="Assessment ID, IP, target..." oninput="filterScansTable()">
+          </div>
+          <div class="filter-group">
+            <label for="scanRatingFilter">Rating Filter:</label>
+            <select id="scanRatingFilter" onchange="filterScansTable()">
+              <option value="">All Ratings</option>
+              <option value="CRITICAL RISK">CRITICAL RISK</option>
+              <option value="HIGH RISK">HIGH RISK</option>
+              <option value="MODERATE">MODERATE</option>
+              <option value="GOOD">GOOD</option>
+              <option value="STRONG">STRONG</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="scanTypeFilter">Type Filter:</label>
+            <select id="scanTypeFilter" onchange="filterScansTable()">
+              <option value="">All Target Types</option>
+              <option value="LOOPBACK">LOOPBACK</option>
+              <option value="PRIVATE">PRIVATE</option>
+              <option value="PUBLIC">PUBLIC</option>
+              <option value="HOSTNAME">HOSTNAME</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Assessment ID</th>
+                <th>Target Host</th>
+                <th>Resolved IP</th>
+                <th>Classification</th>
+                <th>Started At</th>
+                <th>Duration</th>
+                <th>Posture Score</th>
+                <th>Findings</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="scansHistoryBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- 6. FINDINGS CATALOG SECTION -->
+    <div id="findingsSection" class="hidden">
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Security Findings Catalog</h2>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label for="findingSearchInput">Search Finding:</label>
+            <input type="search" id="findingSearchInput" placeholder="Title, finding ID, service, IP..." oninput="loadFindings()">
+          </div>
+          <div class="filter-group">
+            <label for="findingRiskFilter">Severity:</label>
+            <select id="findingRiskFilter" onchange="loadFindings()">
+              <option value="">All Severities</option>
+              <option value="CRITICAL">CRITICAL</option>
+              <option value="HIGH">HIGH</option>
+              <option value="MEDIUM">MEDIUM</option>
+              <option value="LOW">LOW</option>
+              <option value="INFO">INFO</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="findingConfFilter">Confidence:</label>
+            <select id="findingConfFilter" onchange="loadFindings()">
+              <option value="">All Confidence</option>
+              <option value="HIGH">HIGH</option>
+              <option value="MEDIUM">MEDIUM</option>
+              <option value="LOW">LOW</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Finding ID</th>
+                <th>Severity</th>
+                <th>Port / Proto</th>
+                <th>Service & Version</th>
+                <th>Target Asset</th>
+                <th>Title & Analysis</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="findingsCatalogBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- 7. REPORTS MANAGER SECTION -->
+    <div id="reportsSection" class="hidden">
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Generated Security Reports</h2>
+        </div>
+
+        <div class="notice-box">
+          <svg class="notice-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>Reporting System: Machine-readable JSON reports and professional PDF security reports are automatically generated for all completed assessments.</span>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Report Filename</th>
+                <th>Report Type</th>
+                <th>Assessment ID</th>
+                <th>Target / Subnet</th>
+                <th>Generated At</th>
+                <th>File Size</th>
+                <th>Format</th>
+                <th>Download Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reportsListBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
   </main>
 
+  <!-- MODALS FOR DETAILED VIEWS -->
+  <div id="assessmentModal" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 id="mScanTitle">Assessment Scan Details</h2>
+        <button class="modal-close" onclick="closeModal('assessmentModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="mScanBody"></div>
+    </div>
+  </div>
+
+  <div id="assetModal" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 id="mAssetTitle">Asset Inventory Details</h2>
+        <button class="modal-close" onclick="closeModal('assetModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="mAssetBody"></div>
+    </div>
+  </div>
+
+  <div id="findingModal" class="modal-backdrop hidden">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 id="mFindingTitle">Security Finding Details</h2>
+        <button class="modal-close" onclick="closeModal('findingModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="mFindingBody"></div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <footer>
+    <p>NetSecure Defensive Assessment Platform — Security Operations & Reporting Engine</p>
+  </footer>
+
 <script>
-async function startScan() {
-  const target = document.getElementById("target").value.trim();
-  const status = document.getElementById("status");
-  if (!target) return;
-  status.textContent = "Scanning authorized target...";
-  document.getElementById("dashboard").classList.add("hidden");
+let currentTargetInfo = { is_public: false, target_type: 'LOOPBACK' };
+let validateTimeout = null;
+let cachedAssets = [];
+let cachedScans = [];
+
+function showToast(message, type = 'info') {
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = `toast-item ${type}`;
+  toast.innerHTML = `<span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.add("hidden");
+}
+
+function switchTab(tab) {
+  const sections = ["dashboardSection", "hostAssessmentSection", "networkDiscoverySection", "assetsSection", "scansSection", "findingsSection", "reportsSection"];
+  const tabs = ["tabDashboard", "tabHost", "tabDiscovery", "tabAssets", "tabScans", "tabFindings", "tabReports"];
+
+  sections.forEach(s => document.getElementById(s).classList.add("hidden"));
+  tabs.forEach(t => document.getElementById(t).classList.remove("active"));
+
+  if (tab === 'dashboard') {
+    document.getElementById("dashboardSection").classList.remove("hidden");
+    document.getElementById("tabDashboard").classList.add("active");
+    loadDashboard();
+  } else if (tab === 'host') {
+    document.getElementById("hostAssessmentSection").classList.remove("hidden");
+    document.getElementById("tabHost").classList.add("active");
+  } else if (tab === 'discovery') {
+    document.getElementById("networkDiscoverySection").classList.remove("hidden");
+    document.getElementById("tabDiscovery").classList.add("active");
+  } else if (tab === 'assets') {
+    document.getElementById("assetsSection").classList.remove("hidden");
+    document.getElementById("tabAssets").classList.add("active");
+    loadAssets();
+  } else if (tab === 'scans') {
+    document.getElementById("scansSection").classList.remove("hidden");
+    document.getElementById("tabScans").classList.add("active");
+    loadScans();
+  } else if (tab === 'findings') {
+    document.getElementById("findingsSection").classList.remove("hidden");
+    document.getElementById("tabFindings").classList.add("active");
+    loadFindings();
+  } else if (tab === 'reports') {
+    document.getElementById("reportsSection").classList.remove("hidden");
+    document.getElementById("tabReports").classList.add("active");
+    loadReports();
+  }
+}
+
+async function loadDashboard() {
+  try {
+    const res = await fetch("/api/dashboard");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to load dashboard metrics.");
+
+    document.getElementById("dashTotalAssets").textContent = data.total_assets;
+    document.getElementById("dashActiveAssets").textContent = data.active_assets;
+    document.getElementById("dashTotalAssessments").textContent = data.total_assessments;
+    document.getElementById("dashTotalFindings").textContent = data.total_findings;
+
+    const counts = data.counts || {};
+    document.getElementById("dashCntCritical").textContent = counts.CRITICAL || 0;
+    document.getElementById("dashCntHigh").textContent = counts.HIGH || 0;
+    document.getElementById("dashCntMedium").textContent = counts.MEDIUM || 0;
+    document.getElementById("dashCntLow").textContent = counts.LOW || 0;
+
+    const score = data.overall_posture_score;
+    const rating = data.overall_risk_rating;
+    const circle = document.getElementById("dashScoreCircle");
+    const badge = document.getElementById("dashRatingBadge");
+
+    circle.textContent = score;
+    badge.textContent = rating;
+    const slug = rating.toLowerCase().replace(" ", "-");
+    circle.className = `score-circle rating-${slug}`;
+    badge.className = `rating-badge ${slug}`;
+
+    const totalF = data.total_findings || 1;
+    document.getElementById("dashFindingsSummaryText").textContent = `${data.total_findings} Findings Evaluated`;
+    document.getElementById("distCritical").style.width = `${((counts.CRITICAL || 0) / totalF) * 100}%`;
+    document.getElementById("distHigh").style.width = `${((counts.HIGH || 0) / totalF) * 100}%`;
+    document.getElementById("distMedium").style.width = `${((counts.MEDIUM || 0) / totalF) * 100}%`;
+    document.getElementById("distLow").style.width = `${((counts.LOW || 0) / totalF) * 100}%`;
+    document.getElementById("distInfo").style.width = `${((counts.INFO || 0) / totalF) * 100}%`;
+
+    document.getElementById("lblCritical").textContent = counts.CRITICAL || 0;
+    document.getElementById("lblHigh").textContent = counts.HIGH || 0;
+    document.getElementById("lblMedium").textContent = counts.MEDIUM || 0;
+    document.getElementById("lblLow").textContent = counts.LOW || 0;
+    document.getElementById("lblInfo").textContent = counts.INFO || 0;
+
+    const topBody = document.getElementById("dashTopFindingsBody");
+    topBody.innerHTML = "";
+    if (!data.top_findings || data.top_findings.length === 0) {
+      topBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">No findings available. Run an assessment to populate findings.</td></tr>`;
+    } else {
+      data.top_findings.forEach(f => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="finding-id">${f.finding_id}</span></td>
+          <td><span class="risk-badge ${f.risk.toLowerCase()}">${f.risk}</span></td>
+          <td><strong>${f.target || f.ip}</strong> (${f.port}/${f.protocol || 'tcp'})</td>
+          <td>${f.service}</td>
+          <td><button class="btn-secondary" onclick="openFindingModal('${f.finding_id}')">View Finding</button></td>
+        `;
+        topBody.appendChild(tr);
+      });
+    }
+
+    const scanBody = document.getElementById("dashRecentScansBody");
+    scanBody.innerHTML = "";
+    if (!data.recent_assessments || data.recent_assessments.length === 0) {
+      scanBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">No scan assessments executed yet.</td></tr>`;
+    } else {
+      data.recent_assessments.forEach(sc => {
+        const tr = document.createElement("tr");
+        const rSlug = (sc.risk_summary?.risk_rating || 'STRONG').toLowerCase().replace(' ', '-');
+        tr.innerHTML = `
+          <td><span class="assessment-id-tag">${sc.assessment_id}</span></td>
+          <td><strong>${sc.target}</strong> (${sc.resolved_ip})</td>
+          <td><span class="rating-badge ${rSlug}">${sc.risk_summary?.risk_rating || 'STRONG'}</span></td>
+          <td><strong>${sc.risk_summary?.risk_score || 100}</strong>/100</td>
+          <td><button class="btn-secondary" onclick="openAssessmentModal('${sc.assessment_id}')">View Scan</button></td>
+        `;
+        scanBody.appendChild(tr);
+      });
+    }
+
+  } catch (err) {
+    showToast("Failed to load dashboard: " + err.message, "error");
+  }
+}
+
+async function loadAssets() {
+  try {
+    const res = await fetch("/api/assets");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to load assets.");
+    cachedAssets = data;
+    filterAssetsTable();
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+function filterAssetsTable() {
+  const q = document.getElementById("assetSearchInput").value.trim().toLowerCase();
+  const stFilter = document.getElementById("assetStatusFilter").value;
+  const rFilter = document.getElementById("assetRiskFilter").value;
+  const tbody = document.getElementById("assetsInventoryBody");
+
+  tbody.innerHTML = "";
+  const filtered = cachedAssets.filter(a => {
+    if (stFilter && a.status !== stFilter) return false;
+    if (rFilter && a.risk_rating !== rFilter) return false;
+    if (q) {
+      const match = `${a.asset_id} ${a.ip} ${a.hostname} ${a.target_type}`.toLowerCase();
+      if (!match.includes(q)) return false;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:var(--text-muted); padding:24px;">No assets match current search filters.</td></tr>`;
+    return;
+  }
+
+  filtered.forEach(a => {
+    const tr = document.createElement("tr");
+    const rSlug = (a.risk_rating || 'UNASSESSED').toLowerCase().replace(' ', '-');
+    tr.innerHTML = `
+      <td><span class="finding-id">${a.asset_id}</span></td>
+      <td><strong>${a.ip}</strong></td>
+      <td>${a.hostname || '—'}</td>
+      <td><span class="status-badge-${a.status.toLowerCase()}">${a.status}</span></td>
+      <td><span class="type-badge ${a.target_type.toLowerCase()}">${a.target_type}</span></td>
+      <td>${a.open_ports !== null ? a.open_ports : '—'}</td>
+      <td>${a.finding_count || 0}</td>
+      <td><span class="rating-badge ${rSlug}">${a.risk_rating} (${a.risk_score !== null ? a.risk_score : 'N/A'})</span></td>
+      <td>${a.last_assessed || '—'}</td>
+      <td>
+        <div style="display:flex; gap:6px;">
+          <button class="btn-secondary" onclick="openAssetModal('${a.asset_id}')">View</button>
+          <button class="btn-assess" onclick="startScan('${a.ip}')">Assess</button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function loadScans() {
+  try {
+    const res = await fetch("/api/scans");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to load scan history.");
+    cachedScans = data;
+    filterScansTable();
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+function filterScansTable() {
+  const q = document.getElementById("scanSearchInput").value.trim().toLowerCase();
+  const rFilter = document.getElementById("scanRatingFilter").value;
+  const tFilter = document.getElementById("scanTypeFilter").value;
+  const tbody = document.getElementById("scansHistoryBody");
+
+  tbody.innerHTML = "";
+  const filtered = cachedScans.filter(sc => {
+    if (rFilter && sc.risk_summary?.risk_rating !== rFilter) return false;
+    if (tFilter && sc.target_type !== tFilter) return false;
+    if (q) {
+      const match = `${sc.assessment_id} ${sc.target} ${sc.resolved_ip} ${sc.target_type}`.toLowerCase();
+      if (!match.includes(q)) return false;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:var(--text-muted); padding:24px;">No assessment scan records found.</td></tr>`;
+    return;
+  }
+
+  filtered.forEach(sc => {
+    const tr = document.createElement("tr");
+    const rSlug = (sc.risk_summary?.risk_rating || 'STRONG').toLowerCase().replace(' ', '-');
+    tr.innerHTML = `
+      <td><span class="assessment-id-tag">${sc.assessment_id}</span></td>
+      <td><strong>${sc.target}</strong></td>
+      <td>${sc.resolved_ip}</td>
+      <td><span class="type-badge ${sc.target_type.toLowerCase()}">${sc.target_type}</span></td>
+      <td>${sc.started_at}</td>
+      <td>${sc.duration_seconds}s</td>
+      <td><span class="rating-badge ${rSlug}">${sc.risk_summary?.risk_rating || 'STRONG'} (${sc.risk_summary?.risk_score || 100})</span></td>
+      <td>${sc.risk_summary?.finding_count || 0}</td>
+      <td><span class="status-badge-up">${sc.status || 'COMPLETED'}</span></td>
+      <td><button class="btn-secondary" onclick="openAssessmentModal('${sc.assessment_id}')">View Details</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function loadFindings() {
+  try {
+    const q = document.getElementById("findingSearchInput").value.trim();
+    const risk = document.getElementById("findingRiskFilter").value;
+    const conf = document.getElementById("findingConfFilter").value;
+
+    const url = `/api/findings?search=${encodeURIComponent(q)}&risk=${encodeURIComponent(risk)}&confidence=${encodeURIComponent(conf)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to load findings.");
+
+    const tbody = document.getElementById("findingsCatalogBody");
+    tbody.innerHTML = "";
+
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:24px;">No security findings match criteria.</td></tr>`;
+      return;
+    }
+
+    data.forEach(f => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><span class="finding-id">${f.finding_id}</span></td>
+        <td><span class="risk-badge ${f.risk.toLowerCase()}">${f.risk}</span></td>
+        <td><strong>${f.port}/${f.protocol || 'tcp'}</strong></td>
+        <td>
+          <div><strong>${f.service}</strong></div>
+          <div style="font-size:11px; color:var(--text-subtle);">${f.version || '—'}</div>
+        </td>
+        <td>${f.target || f.ip}</td>
+        <td>
+          <div style="font-weight:600;">${f.title}</div>
+          <div style="font-size:12px; color:var(--text-muted);">${f.description}</div>
+        </td>
+        <td><button class="btn-secondary" onclick="openFindingModal('${f.finding_id}')">View</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+async function loadReports() {
+  try {
+    const res = await fetch("/api/reports");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to list reports.");
+
+    const tbody = document.getElementById("reportsListBody");
+    tbody.innerHTML = "";
+
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:24px;">No reports generated yet. Run an assessment or discovery to produce reports.</td></tr>`;
+      return;
+    }
+
+    data.forEach(r => {
+      const tr = document.createElement("tr");
+      const kbSize = (r.file_size_bytes / 1024).toFixed(1);
+      const isPdf = r.format === "PDF";
+      const downloadPath = r.download_url || (isPdf ? `/reports/pdf/${r.filename}` : `/reports/json/${r.filename}`);
+
+      tr.innerHTML = `
+        <td><span class="finding-id">${r.filename}</span></td>
+        <td>${r.report_type}</td>
+        <td><span class="assessment-id-tag">${r.report_id}</span></td>
+        <td><strong>${r.target}</strong></td>
+        <td>${r.created_at}</td>
+        <td>${kbSize} KB</td>
+        <td><span class="type-badge ${isPdf ? 'public' : 'private'}">${r.format}</span></td>
+        <td>
+          <a class="btn-secondary" href="${downloadPath}" target="_blank">Download ${r.format}</a>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+async function openAssessmentModal(assessmentId) {
+  try {
+    const res = await fetch(`/api/scans/${assessmentId}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Scan record not found.");
+
+    document.getElementById("mScanTitle").textContent = `Assessment Scan: ${data.assessment_id}`;
+    const body = document.getElementById("mScanBody");
+    
+    let findingsHtml = "";
+    if (!data.findings || data.findings.length === 0) {
+      findingsHtml = `<div class="zero-findings-box"><h3>No Significant Findings</h3><p>No open ports or risks detected within the tested scope.</p></div>`;
+    } else {
+      findingsHtml = `
+        <div class="table-responsive" style="margin-top:12px;">
+          <table>
+            <thead><tr><th>Port</th><th>Service</th><th>Severity</th><th>Evidence</th></tr></thead>
+            <tbody>
+              ${data.findings.map(f => `
+                <tr>
+                  <td><strong>${f.port}/${f.protocol || 'tcp'}</strong></td>
+                  <td>${f.service} ${f.version ? '('+f.version+')' : ''}</td>
+                  <td><span class="risk-badge ${f.risk.toLowerCase()}">${f.risk}</span></td>
+                  <td style="font-size:12px; font-family:monospace;">${f.evidence}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    body.innerHTML = `
+      <div class="summary-details" style="margin-top:0;">
+        <div class="summary-item"><label>Target</label><span>${data.target} (${data.resolved_ip})</span></div>
+        <div class="summary-item"><label>Target Type</label><span>${data.target_type}</span></div>
+        <div class="summary-item"><label>Posture Score</label><span>${data.risk_summary?.risk_score || 100}/100 (${data.risk_summary?.risk_rating || 'STRONG'})</span></div>
+        <div class="summary-item"><label>Started At</label><span>${data.started_at}</span></div>
+        <div class="summary-item"><label>Duration</label><span>${data.duration_seconds}s</span></div>
+        <div class="summary-item"><label>Open Ports</label><span>${data.open_ports}</span></div>
+      </div>
+      <h4 style="margin:16px 0 8px; color:var(--text-main);">Identified Security Findings</h4>
+      ${findingsHtml}
+      <div style="margin-top:20px; display:flex; gap:12px;">
+        <a class="btn-download" href="/api/reports/${data.assessment_id}/json" target="_blank">Download JSON Report</a>
+        <a class="btn-download" href="/api/reports/${data.assessment_id}/pdf" target="_blank" style="color:#ff8e9e; border-color:#8b2635;">Download PDF Report</a>
+      </div>
+    `;
+    document.getElementById("assessmentModal").classList.remove("hidden");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+async function openAssetModal(assetId) {
+  try {
+    const res = await fetch(`/api/assets/${assetId}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Asset not found.");
+
+    document.getElementById("mAssetTitle").textContent = `Asset Details: ${data.asset_id}`;
+    const body = document.getElementById("mAssetBody");
+
+    let historyHtml = "";
+    if (!data.assessment_history || data.assessment_history.length === 0) {
+      historyHtml = `<p style="color:var(--text-muted); font-size:13px; padding:12px 0;">No completed assessments for this asset.</p>`;
+    } else {
+      historyHtml = `
+        <div class="table-responsive" style="margin-top:10px;">
+          <table>
+            <thead><tr><th>Assessment ID</th><th>Completed</th><th>Score</th><th>Rating</th><th>Findings</th></tr></thead>
+            <tbody>
+              ${data.assessment_history.map(h => `
+                <tr>
+                  <td><span class="assessment-id-tag">${h.assessment_id}</span></td>
+                  <td>${h.completed_at}</td>
+                  <td><strong>${h.risk_score}</strong>/100</td>
+                  <td><span class="rating-badge ${h.risk_rating.toLowerCase().replace(' ', '-')}">${h.risk_rating}</span></td>
+                  <td>${h.finding_count}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    body.innerHTML = `
+      <div class="summary-details" style="margin-top:0;">
+        <div class="summary-item"><label>IP Address</label><span>${data.ip}</span></div>
+        <div class="summary-item"><label>Hostname</label><span>${data.hostname || '—'}</span></div>
+        <div class="summary-item"><label>Status</label><span><span class="status-badge-${data.status.toLowerCase()}">${data.status}</span></span></div>
+        <div class="summary-item"><label>Target Scope</label><span>${data.target_type}</span></div>
+        <div class="summary-item"><label>First Discovered</label><span>${data.first_discovered || '—'}</span></div>
+        <div class="summary-item"><label>Last Assessed</label><span>${data.last_assessed || '—'}</span></div>
+      </div>
+      <h4 style="margin:16px 0 8px; color:var(--text-main);">Assessment History</h4>
+      ${historyHtml}
+      <div style="margin-top:20px;">
+        <button class="btn-primary" onclick="closeModal('assetModal'); startScan('${data.ip}');">Assess Host Now</button>
+      </div>
+    `;
+    document.getElementById("assetModal").classList.remove("hidden");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+async function openFindingModal(findingId) {
+  try {
+    const res = await fetch(`/api/findings/${findingId}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Finding not found.");
+
+    document.getElementById("mFindingTitle").textContent = `Finding Detail: ${data.finding_id}`;
+    const body = document.getElementById("mFindingBody");
+
+    body.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <div>
+          <span class="risk-badge ${data.risk.toLowerCase()}">${data.risk}</span>
+          <span class="confidence-tag ${data.confidence.toLowerCase()}">Confidence: ${data.confidence}</span>
+        </div>
+        <span class="assessment-id-tag">${data.assessment_id}</span>
+      </div>
+
+      <h3 style="font-size:16px; color:var(--text-main); margin-bottom:6px;">${data.title}</h3>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">${data.description}</p>
+
+      <div class="summary-details" style="margin:0 0 16px;">
+        <div class="summary-item"><label>Asset IP</label><span>${data.target || data.ip}</span></div>
+        <div class="summary-item"><label>Port / Protocol</label><span>${data.port} / ${data.protocol || 'tcp'}</span></div>
+        <div class="summary-item"><label>Enumerated Service</label><span>${data.service} ${data.version ? '('+data.version+')' : ''}</span></div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label style="font-size:12px; font-weight:700; color:var(--text-muted);">Observed Technical Evidence:</label>
+        <div class="evidence-box">${data.evidence}</div>
+      </div>
+
+      <div style="margin-bottom:12px; font-size:13px;">
+        <strong style="color:var(--text-main);">Security Impact:</strong>
+        <p style="color:var(--text-muted); margin-top:2px;">${data.impact}</p>
+      </div>
+
+      <div style="margin-bottom:12px; font-size:13px;">
+        <strong style="color:var(--text-main);">Recommendation:</strong>
+        <p style="color:var(--text-muted); margin-top:2px;">${data.recommendation}</p>
+      </div>
+
+      <div style="margin-bottom:12px; font-size:13px;">
+        <strong style="color:var(--text-main);">Remediation Guidance:</strong>
+        <p style="color:var(--text-muted); margin-top:2px;">${data.remediation}</p>
+      </div>
+    `;
+    document.getElementById("findingModal").classList.remove("hidden");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+function handleTargetInput() {
+  clearTimeout(validateTimeout);
+  validateTimeout = setTimeout(checkTargetClassification, 300);
+}
+
+async function checkTargetClassification() {
+  const targetVal = document.getElementById("target").value.trim();
+  const authContainer = document.getElementById("authConfirmContainer");
+  const authCheckbox = document.getElementById("authConfirmCheckbox");
+  const scanBtn = document.getElementById("scanBtn");
+  const headerBadge = document.getElementById("targetTypeBadgeHeader");
+
+  if (!targetVal) return;
+
+  try {
+    const res = await fetch("/api/validate-target", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ target: targetVal })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      currentTargetInfo = data;
+      headerBadge.textContent = data.target_type;
+      headerBadge.className = `type-badge ${data.target_type.toLowerCase().split(' ')[0]}`;
+
+      if (data.is_public) {
+        authContainer.classList.remove("hidden");
+        scanBtn.disabled = !authCheckbox.checked;
+      } else {
+        authContainer.classList.add("hidden");
+        scanBtn.disabled = false;
+      }
+    }
+  } catch (err) {}
+}
+
+function toggleAuthScanBtn() {
+  const scanBtn = document.getElementById("scanBtn");
+  const authCheckbox = document.getElementById("authConfirmCheckbox");
+  if (currentTargetInfo.is_public) {
+    scanBtn.disabled = !authCheckbox.checked;
+  } else {
+    scanBtn.disabled = false;
+  }
+}
+
+async function startScan(overrideTarget = null) {
+  if (overrideTarget) {
+    document.getElementById("target").value = overrideTarget;
+    switchTab('host');
+    await checkTargetClassification();
+  }
+
+  const targetInput = document.getElementById("target");
+  const target = targetInput.value.trim();
+  const scanBtn = document.getElementById("scanBtn");
+  const statusDot = document.getElementById("statusDot");
+  const statusText = document.getElementById("statusText");
+  const dashboard = document.getElementById("dashboard");
+  const authCheckbox = document.getElementById("authConfirmCheckbox");
+
+  if (!target) {
+    statusDot.className = "status-indicator error";
+    statusText.textContent = "Error: Please enter a target IP address or hostname.";
+    showToast("Please enter a target IP address or hostname.", "error");
+    return;
+  }
+
+  if (currentTargetInfo.is_public && !authCheckbox.checked) {
+    statusDot.className = "status-indicator error";
+    statusText.textContent = "Authorization required: Please check the confirmation checkbox for public targets.";
+    showToast("Authorization confirmation required for public targets.", "warning");
+    return;
+  }
+
+  scanBtn.disabled = true;
+  statusDot.className = "status-indicator scanning";
+  statusText.textContent = "Resolving target & classifying assessment scope...";
+  dashboard.classList.add("hidden");
+  showToast(`Initiating assessment for ${target}...`, "info");
+
+  const stepTimer1 = setTimeout(() => {
+    statusText.textContent = "Checking TCP ports & running Nmap service detection...";
+  }, 1200);
+
+  const stepTimer2 = setTimeout(() => {
+    statusText.textContent = "Analyzing findings & generating JSON / PDF reports...";
+  }, 2500);
 
   try {
     const res = await fetch("/api/scan", {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({target})
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        target,
+        confirmed_authorized: authCheckbox.checked
+      })
     });
+    
+    clearTimeout(stepTimer1);
+    clearTimeout(stepTimer2);
+
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Scan failed");
-
-    document.getElementById("dashboard").classList.remove("hidden");
-    document.getElementById("targetOut").textContent = data.target + " (" + data.ip + ")";
-    document.getElementById("openPorts").textContent = data.open_ports;
-    document.getElementById("high").textContent = data.counts.HIGH;
-    document.getElementById("medium").textContent = data.counts.MEDIUM;
-    document.getElementById("low").textContent = data.counts.LOW;
-    document.getElementById("nmap").textContent = data.nmap_available ? "Nmap enabled" : "Nmap not found";
-
-    const tbody = document.getElementById("findings");
-    tbody.innerHTML = "";
-    for (const f of data.findings) {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${f.port}</td><td>${f.service}</td><td>${f.version || "-"}</td>
-        <td><span class="risk ${f.risk.toLowerCase()}">${f.risk}</span></td>
-        <td>${f.recommendation}</td>`;
-      tbody.appendChild(tr);
+    if (!res.ok) {
+      if (res.status === 403 && data.authorization_required) {
+        document.getElementById("authConfirmContainer").classList.remove("hidden");
+        throw new Error(data.error || "Explicit authorization confirmation required.");
+      }
+      throw new Error(data.error || "Scan failed.");
     }
 
-    document.getElementById("summary").textContent =
-      `Assessment completed. ${data.open_ports} open port(s) were found across ${data.ports_scanned} common ports.`;
-    document.getElementById("download").href = "/reports/" + data.report_file;
-    status.textContent = "Scan completed successfully.";
+    statusDot.className = "status-indicator success";
+    statusText.textContent = "Scan completed successfully.";
+    dashboard.classList.remove("hidden");
+    showToast(`Assessment ${data.assessment_id} completed successfully. Reports generated.`, "success");
+
+    const riskSum = data.risk_summary || { risk_score: 100, risk_rating: 'STRONG' };
+    const scoreCircle = document.getElementById("postureScoreCircle");
+    const ratingBadge = document.getElementById("postureRatingBadge");
+
+    scoreCircle.textContent = riskSum.risk_score;
+    ratingBadge.textContent = riskSum.risk_rating;
+
+    const ratingSlug = riskSum.risk_rating.toLowerCase().replace(' ', '-');
+    scoreCircle.className = `score-circle rating-${ratingSlug}`;
+    ratingBadge.className = `rating-badge ${ratingSlug}`;
+
+    document.getElementById("assessmentIdDisplay").textContent = data.assessment_id;
+    document.getElementById("summaryId").textContent = data.assessment_id;
+    document.getElementById("targetOut").textContent = `${data.target} (${data.resolved_ip})`;
+    document.getElementById("summaryScoreDisplay").textContent = `${riskSum.risk_score}/100 (${riskSum.risk_rating})`;
+    
+    const typeBadge = document.getElementById("targetTypeBadge");
+    typeBadge.textContent = data.target_type;
+    typeBadge.className = `type-badge ${data.target_type.toLowerCase().split(' ')[0]}`;
+    document.getElementById("summaryType").textContent = data.target_type;
+
+    document.getElementById("openPorts").textContent = data.open_ports;
+    document.getElementById("cntCritical").textContent = data.counts.CRITICAL || 0;
+    document.getElementById("cntHigh").textContent = data.counts.HIGH || 0;
+    document.getElementById("cntMedium").textContent = data.counts.MEDIUM || 0;
+    document.getElementById("cntLow").textContent = data.counts.LOW || 0;
+    document.getElementById("cntInfo").textContent = data.counts.INFO || 0;
+
+    const tbody = document.getElementById("findingsBody");
+    const zeroContainer = document.getElementById("zeroFindingsContainer");
+    const tableWrap = document.getElementById("findingsTableWrap");
+    tbody.innerHTML = "";
+    document.getElementById("findingsCountTag").textContent = `${data.findings.length} Finding(s)`;
+
+    if (data.findings.length === 0) {
+      zeroContainer.classList.remove("hidden");
+      tableWrap.classList.add("hidden");
+      if (data.executive_summary_data && data.executive_summary_data.zero_findings_notice) {
+        document.getElementById("zeroFindingsText").textContent = data.executive_summary_data.zero_findings_notice;
+      }
+    } else {
+      zeroContainer.classList.add("hidden");
+      tableWrap.classList.remove("hidden");
+      for (const f of data.findings) {
+        const tr = document.createElement("tr");
+        const riskClass = f.risk.toLowerCase();
+        const confClass = (f.confidence || 'HIGH').toLowerCase();
+        tr.innerHTML = `
+          <td><strong>${f.port}/${f.protocol || 'tcp'}</strong></td>
+          <td>
+            <div><strong>${f.service || "Unknown"}</strong></div>
+            <div style="font-size:11px; color:var(--text-subtle);">${f.version || "—"}</div>
+          </td>
+          <td>
+            <span class="risk-badge ${riskClass}">${f.risk}</span>
+            <div><span class="confidence-tag ${confClass}">Conf: ${f.confidence || 'HIGH'}</span></div>
+          </td>
+          <td>
+            <div class="finding-title">
+              <span class="finding-id">${f.finding_id || ''}</span>
+              <span>${f.title || 'Service Exposure'}</span>
+            </div>
+            <div class="finding-text">${f.description || ''}</div>
+            <div class="evidence-box">Evidence: ${f.evidence || 'Port open'}</div>
+            <div class="finding-detail-section" style="margin-top:6px;"><strong>Impact:</strong> ${f.impact || f.recommendation}</div>
+            <div class="finding-detail-section" style="margin-top:4px;"><strong>Remediation:</strong> ${f.remediation || f.recommendation}</div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    document.getElementById("summaryText").textContent =
+      `Security evaluation [${data.assessment_id}] for ${data.target_type} target ${data.target} (${data.resolved_ip}) finished with NetSecure Security Posture Score ${riskSum.risk_score}/100 (${riskSum.risk_rating}). ${data.open_ports} open port(s) detected across ${data.ports_scanned} common ports evaluated.`;
+    document.getElementById("scanStarted").textContent = data.started_at || "—";
+    document.getElementById("scanCompleted").textContent = data.completed_at || "—";
+    document.getElementById("scanDuration").textContent = data.duration_seconds ? `${data.duration_seconds}s` : "—";
+    
+    document.getElementById("downloadJsonBtn").href = `/api/reports/${data.assessment_id}/json`;
+    document.getElementById("downloadPdfBtn").href = `/api/reports/${data.assessment_id}/pdf`;
+
   } catch (err) {
-    status.textContent = "Error: " + err.message;
+    clearTimeout(stepTimer1);
+    clearTimeout(stepTimer2);
+    statusDot.className = "status-indicator error";
+    statusText.textContent = "Error: " + err.message;
+    showToast(err.message, "error");
+  } finally {
+    scanBtn.disabled = currentTargetInfo.is_public && !authCheckbox.checked;
   }
 }
+
+async function startDiscovery() {
+  const netInput = document.getElementById("networkInput");
+  const network = netInput.value.trim();
+  const discBtn = document.getElementById("discoverBtn");
+  const discDot = document.getElementById("discStatusDot");
+  const discText = document.getElementById("discStatusText");
+  const discDashboard = document.getElementById("discoveryDashboard");
+
+  if (!network) {
+    discDot.className = "status-indicator error";
+    discText.textContent = "Error: Please enter a private network CIDR notation.";
+    showToast("Please enter a private network CIDR notation.", "error");
+    return;
+  }
+
+  discBtn.disabled = true;
+  discDot.className = "status-indicator scanning";
+  discText.textContent = "Probing hosts on authorized subnet...";
+  discDashboard.classList.add("hidden");
+  showToast(`Initiating network discovery on ${network}...`, "info");
+
+  try {
+    const res = await fetch("/api/discover", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ network })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Discovery failed.");
+
+    discDot.className = "status-indicator success";
+    discText.textContent = `Discovery completed successfully. Discovered ${data.hosts_up} active host(s).`;
+    discDashboard.classList.remove("hidden");
+    showToast(`Discovery ${data.discovery_id} completed: ${data.hosts_up} host(s) active. Reports generated.`, "success");
+
+    document.getElementById("discoveryIdDisplay").textContent = data.discovery_id;
+    document.getElementById("discNetworkBadge").textContent = `${data.network} (${data.network_type})`;
+    document.getElementById("discHostsChecked").textContent = data.hosts_checked;
+    document.getElementById("discHostsUp").textContent = data.hosts_up;
+    document.getElementById("discHostsDown").textContent = data.hosts_down;
+    document.getElementById("discDuration").textContent = `${data.duration_seconds}s`;
+
+    const assetBody = document.getElementById("assetBody");
+    assetBody.innerHTML = "";
+    document.getElementById("assetsCountTag").textContent = `${data.assets.length} Active Asset(s)`;
+
+    if (data.assets.length === 0) {
+      assetBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:24px;">No reachable active hosts discovered on subnet ${data.network}.</td></tr>`;
+    } else {
+      for (const asset of data.assets) {
+        const tr = document.createElement("tr");
+        const typeClass = asset.target_type.toLowerCase();
+        tr.innerHTML = `
+          <td><span class="finding-id">${asset.asset_id}</span></td>
+          <td><strong>${asset.ip}</strong></td>
+          <td>${asset.hostname || '—'}</td>
+          <td><span class="status-badge-up">${asset.status}</span></td>
+          <td><span class="type-badge ${typeClass}">${asset.target_type}</span></td>
+          <td>${asset.last_seen}</td>
+          <td>
+            <button class="btn-assess" onclick="startScan('${asset.ip}')">
+              <span>Assess Host</span>
+            </button>
+          </td>
+        `;
+        assetBody.appendChild(tr);
+      }
+    }
+  } catch (err) {
+    discDot.className = "status-indicator error";
+    discText.textContent = "Error: " + err.message;
+    showToast(err.message, "error");
+  } finally {
+    discBtn.disabled = false;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  checkTargetClassification();
+  loadDashboard();
+});
 </script>
 </body>
 </html>
